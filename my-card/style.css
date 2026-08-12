@@ -1,0 +1,224 @@
+/* ========== 全局重置 ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ========== 整体页面样式 ========== */
+body {
+    background: #0d0b1a;
+    /* 深紫黑色背景 */
+    font-family: Arial, "PingFang SC", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* ========== 名片卡片 ========== */
+.card {
+    max-width: 420px;
+    width: 100%;
+    background: #1a1630;
+    border-radius: 28px;
+    padding: 36px 28px 32px;
+    box-shadow: 0 0 40px rgba(120, 80, 255, 0.25);
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+}
+
+/* ========== 头像 ========== */
+.avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #a855f7;
+    box-shadow: 0 0 30px rgba(168, 85, 247, 0.35);
+    margin-bottom: 16px;
+}
+
+/* ========== 名字 ========== */
+.name {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.name .emoji {
+    font-style: normal;
+}
+
+/* ========== 个性签名 ========== */
+.bio {
+    font-size: 15px;
+    color: #c4b5d4;
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+/* ========== 标签 ========== */
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 22px;
+}
+
+.tags span {
+    background: rgba(168, 85, 247, 0.18);
+    color: #d8b4fe;
+    font-size: 13px;
+    padding: 4px 14px;
+    border-radius: 30px;
+    border: 1px solid rgba(168, 85, 247, 0.20);
+}
+
+/* ========== 按钮 ========== */
+.btn {
+    display: inline-block;
+    background: #a855f7;
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 600;
+    padding: 14px 40px;
+    border-radius: 40px;
+    text-decoration: none;
+    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+    margin-bottom: 28px;
+    box-shadow: 0 6px 24px rgba(168, 85, 247, 0.35);
+}
+
+.btn:hover {
+    background: #7c3aed;
+    transform: scale(1.03);
+    box-shadow: 0 8px 32px rgba(168, 85, 247, 0.50);
+}
+
+/* ========== 分割线 ========== */
+.divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #a855f7, transparent);
+    margin-bottom: 22px;
+    opacity: 0.4;
+}
+
+/* ========== 作品区域标题 ========== */
+.section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #e5d9f2;
+    margin-bottom: 14px;
+    letter-spacing: 1px;
+}
+
+/* ========== 作品网格 ========== */
+.works {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 26px;
+}
+
+.works a {
+    display: block;
+    border-radius: 14px;
+    overflow: hidden;
+    transition: transform 0.25s, box-shadow 0.25s;
+    text-decoration: none;
+    background: #2a2445;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.works a:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 8px 24px rgba(168, 85, 247, 0.30);
+}
+
+.works a img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: block;
+}
+
+.works a .work-title {
+    font-size: 11px;
+    color: #c4b5d4;
+    padding: 6px 6px 8px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ========== 社交链接 ========== */
+.socials {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.socials a {
+    color: #a78bbf;
+    font-size: 14px;
+    text-decoration: none;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.04);
+    transition: background 0.3s, color 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.socials a:hover {
+    background: rgba(168, 85, 247, 0.20);
+    color: #d8b4fe;
+}
+
+/* ========== 页脚 ========== */
+.footer {
+    font-size: 12px;
+    color: #5a4d73;
+    margin-top: 6px;
+}
+
+.footer a {
+    color: #7c6a99;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    color: #a855f7;
+}
+
+@media (max-width: 480px) {
+    .card {
+        padding: 28px 18px 24px;
+    }
+
+    .works {
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+    }
+
+    .works a .work-title {
+        font-size: 10px;
+        padding: 4px 4px 6px;
+    }
+
+    .btn {
+        font-size: 15px;
+        padding: 12px 30px;
+    }
+}
