@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mistake Tracker · 错题记录器</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #ffffff;
+      font-family: 'SF Mono', 'Menlo', 'Consolas', 'Courier New', monospace;
+      padding: 2rem 1rem;
+      color: #000;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app {
+      max-width: 860px;
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-bottom: 0.2rem;
+    }
+
+    .subhead {
+      color: #555;
+      font-size: 0.78rem;
+      margin-bottom: 2rem;
+      border-left: 2px solid #000;
+      padding-left: 0.7rem;
+      line-height: 1.5;
+    }
+
+    /* 图例 - 横排文字 */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      font-size: 0.72rem;
+      color: #333;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 0.12rem 0.55rem;
+      border: 1px solid #000;
+      font-size: 0.66rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .tag.gap {
+      background: #000;
+      color: #fff;
+    }
+
+    .tag.stable {
+      background: #fff;
+      color: #000;
+      border-style: dashed;
+    }
+
+    .tag.low {
+      background: #eee;
+      color: #000;
+      border-color: #999;
+    }
+
+    /* 添加区 - 去掉卡片感，只留分隔线 */
+    .add-section {
+      padding-bottom: 1.6rem;
+      margin-bottom: 1.6rem;
+      border-bottom: 1px solid #000;
+    }
+
+    .add-section h2 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.9rem;
+    }
+
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 0.8rem;
+    }
+
+    .form-group {
+      flex: 1 1 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .form-group label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #000;
+    }
+
+    .form-group input,
+    .form-group select {
+      background: #fff;
+      border: 1px solid #000;
+      padding: 0.55rem 0.7rem;
+      font-size: 0.82rem;
+      font-family: inherit;
+      width: 100%;
+      color: #000;
+      border-radius: 0;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-width: 2px;
+      padding: calc(0.55rem - 1px) calc(0.7rem - 1px);
+    }
+
+    .form-group input::placeholder {
+      color: #999;
+    }
+
+    button {
+      background: #000;
+      color: #fff;
+      font-weight: 700;
+      border: 1px solid #000;
+      padding: 0.55rem 1.4rem;
+      font-size: 0.82rem;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      border-radius: 0;
+      transition: none;
+    }
+
+    button:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    button:active {
+      background: #000;
+      color: #fff;
+    }
+
+    .hint {
+      font-size: 0.66rem;
+      color: #888;
+      margin-top: 0.15rem;
+      min-height: 1rem;
+    }
+
+    /* 工具栏 */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+    }
+
+    .filter-btn {
+      background: #fff;
+      border: 1px solid #000;
+      padding: 0.4rem 0.85rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #000;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 0.02em;
+      border-radius: 0;
+      margin-left: -1px;
+      transition: none;
+    }
+
+    .filter-btn:first-child {
+      margin-left: 0;
+    }
+
+    .filter-btn.active {
+      background: #000;
+      color: #fff;
+    }
+
+    .filter-btn:hover:not(.active) {
+      background: #eee;
+    }
+
+    .stats {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.7rem;
+      color: #000;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .stats .count {
+      font-weight: 700;
+      border-bottom: 2px solid #000;
+      padding: 0 0.1rem;
+    }
+
+    /* 列表 - 只有横线分隔 */
+    .problem-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .problem-item {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem 1rem;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .problem-item:first-child {
+      border-top: 1px solid #000;
+    }
+
+    .problem-info {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 1rem;
+      flex: 1 1 280px;
+    }
+
+    .problem-link {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #000;
+      text-decoration: none;
+      word-break: break-all;
+      border-bottom: 1px solid #000;
+    }
+
+    .problem-link:hover {
+      background: #000;
+      color: #fff;
+    }
+
+    .problem-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .problem-date {
+      font-size: 0.65rem;
+      color: #888;
+      white-space: nowrap;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      width: 1.8rem;
+      height: 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: #999;
+      font-family: inherit;
+      padding: 0;
+    }
+
+    .icon-btn:hover {
+      color: #000;
+      border-color: #000;
+      background: #fff;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: #999;
+      font-size: 0.78rem;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .badge-inline {
+      font-size: 0.62rem;
+      padding: 0.1rem 0.5rem;
+    }
+
+    /* 响应式微调 */
+    @media (max-width: 520px) {
+      h1 { font-size: 1.1rem; }
+      .stats { gap: 0.6rem; font-size: 0.62rem; }
+      .filter-btn { padding: 0.35rem 0.55rem; font-size: 0.65rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>MISTAKE TRACKER</h1>
+    <div class="subhead">记录洛谷错题 · 正解缺口 / 稳定缺口 / 低级失误</div>
+
+    <!-- 图例 -->
+    <div class="legend">
+      <div class="legend-item"><span class="tag gap">正解缺口</span> 算法/思路完全不会</div>
+      <div class="legend-item"><span class="tag stable">稳定缺口</span> 细节：边界/溢出/复杂度</div>
+      <div class="legend-item"><span class="tag low">低级失误</span> 粗心/看错/手误</div>
+    </div>
+
+    <!-- 添加区 -->
+    <div class="add-section">
+      <h2>+ 记录错题</h2>
+      <div class="form-row">
+        <div class="form-group" style="flex: 2 1 260px;">
+          <label>洛谷题目链接 / 题号</label>
+          <input type="text" id="problemInput" placeholder="https://www.luogu.com.cn/problem/P1001 或 P1001" maxlength="200" autocomplete="off">
+        </div>
+        <div class="form-group" style="flex: 1 1 160px;">
+          <label>错题类型</label>
+          <select id="typeSelect">
+            <option value="gap">正解缺口（根本不会）</option>
+            <option value="stable">稳定缺口（细节/边界/溢出）</option>
+            <option value="low">低级失误（粗心/看错）</option>
+          </select>
+        </div>
+        <button id="addBtn" style="flex: 0 0 auto;">记录</button>
+      </div>
+    </div>
+
+    <!-- 工具栏 -->
+    <div class="toolbar">
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">全部</button>
+        <button class="filter-btn" data-filter="gap">正解缺口</button>
+        <button class="filter-btn" data-filter="stable">稳定缺口</button>
+        <button class="filter-btn" data-filter="low">低级失误</button>
+      </div>
+      <div class="stats" id="statsContainer"></div>
+    </div>
+
+    <!-- 列表 -->
+    <div id="problemList" class="problem-list"></div>
+    <div id="emptyMessage" class="empty-state" style="display: none;">暂无记录</div>
+  </div>
+
+  <script>
+    (function() {
+      let problems = [];
+      let currentFilter = 'all';
+
+      const STORAGE_KEY = 'mistake_tracker_luogu_v2';
+
+      const problemInput = document.getElementById('problemInput');
+      const typeSelect = document.getElementById('typeSelect');
+      const addBtn = document.getElementById('addBtn');
+      const problemListEl = document.getElementById('problemList');
+      const emptyMessage = document.getElementById('emptyMessage');
+      const statsContainer = document.getElementById('statsContainer');
+      const filterBtns = document.querySelectorAll('.filter-btn');
+      const previewHint = document.getElementById('previewHint');
+
+      // ---------- 洛谷链接解析 ----------
+      function parseLuoguInput(raw) {
+        if (!raw) return null;
+        const trimmed = raw.trim();
+        if (!trimmed) return null;
+
+        const linkMatch = trimmed.match(/\/problem\/([A-Za-z0-9_]+)(?:\/|\?|$)/i);
+        if (linkMatch && linkMatch[1]) {
+          const pid = linkMatch[1].toUpperCase();
+          return { problemId: pid, fullLink: `https://www.luogu.com.cn/problem/${pid}` };
+        }
+
+        const idMatch = trimmed.match(/^([A-Za-z][A-Za-z0-9_]{1,19})$/);
+        if (idMatch) {
+          const pid = idMatch[1].toUpperCase();
+          return { problemId: pid, fullLink: `https://www.luogu.com.cn/problem/${pid}` };
+        }
+
+        const looseMatch = trimmed.match(/(?:luogu\.com\.cn\/problem\/?)([A-Za-z0-9_]+)/i);
+        if (looseMatch && looseMatch[1]) {
+          const pid = looseMatch[1].toUpperCase();
+          return { problemId: pid, fullLink: `https://www.luogu.com.cn/problem/${pid}` };
+        }
+
+        return null;
+      }
+
+      // ---------- 工具 ----------
+      function generateId() {
+        return Date.now() + '-' + Math.random().toString(36).substring(2, 8);
+      }
+
+      function formatDate(timestamp) {
+        const d = new Date(timestamp);
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        return `${month}-${day} ${hours}:${minutes}`;
+      }
+
+      function getTypeInfo(type) {
+        switch(type) {
+          case 'gap': return { label: '正解缺口', badgeClass: 'gap' };
+          case 'stable': return { label: '稳定缺口', badgeClass: 'stable' };
+          case 'low': return { label: '低级失误', badgeClass: 'low' };
+          default: return { label: '未知', badgeClass: 'gap' };
+        }
+      }
+
+      function saveToStorage() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(problems)); }
+        catch (e) { console.warn('无法保存', e); }
+      }
+
+      function loadFromStorage() {
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed)) {
+              problems = parsed.filter(p => p && p.id && p.type && p.date)
+                .map(p => {
+                  if (p.link && p.problemId) return { ...p };
+                  if (p.title) {
+                    const parsedLink = parseLuoguInput(p.title);
+                    if (parsedLink) {
+                      return {
+                        id: p.id,
+                        link: parsedLink.fullLink,
+                        problemId: parsedLink.problemId,
+                        type: p.type,
+                        date: p.date
+                      };
+                    }
+                  }
+                  return null;
+                })
+                .filter(p => p !== null);
+            }
+          }
+        } catch (e) {
+          console.warn('读取失败', e);
+          problems = [];
+        }
+      }
+
+      // ---------- 渲染 ----------
+      function render() {
+        const filtered = problems.filter(p => {
+          if (currentFilter === 'all') return true;
+          return p.type === currentFilter;
+        });
+
+        if (filtered.length === 0) {
+          problemListEl.innerHTML = '';
+          emptyMessage.style.display = 'block';
+        } else {
+          emptyMessage.style.display = 'none';
+          const html = filtered.map(problem => {
+            const typeInfo = getTypeInfo(problem.type);
+            const displayId = problem.problemId || problem.link;
+            return `
+              <div class="problem-item" data-id="${problem.id}">
+                <div class="problem-info">
+                  <a class="problem-link" href="${escapeHtml(problem.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(displayId)}</a>
+                  <div class="problem-meta">
+                    <span class="tag ${typeInfo.badgeClass} badge-inline">${typeInfo.label}</span>
+                    <span class="problem-date">${formatDate(problem.date)}</span>
+                  </div>
+                </div>
+                <div class="problem-actions">
+                  <button class="icon-btn delete-btn" data-id="${problem.id}" title="删除" aria-label="删除">×</button>
+                </div>
+              </div>
+            `;
+          }).join('');
+          problemListEl.innerHTML = html;
+        }
+
+        const total = problems.length;
+        const gapCount = problems.filter(p => p.type === 'gap').length;
+        const stableCount = problems.filter(p => p.type === 'stable').length;
+        const lowCount = problems.filter(p => p.type === 'low').length;
+
+        statsContainer.innerHTML = `
+          <span>总 <span class="count">${total}</span></span>
+          <span>正解 <span class="count">${gapCount}</span></span>
+          <span>稳定 <span class="count">${stableCount}</span></span>
+          <span>低级 <span class="count">${lowCount}</span></span>
+        `;
+
+        filterBtns.forEach(btn => {
+          if (btn.dataset.filter === currentFilter) btn.classList.add('active');
+          else btn.classList.remove('active');
+        });
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      // ---------- 添加 ----------
+      function addProblem() {
+        const raw = problemInput.value.trim();
+        if (!raw) {
+          alert('请输入洛谷题目链接或题号');
+          problemInput.focus();
+          return;
+        }
+
+        const parsed = parseLuoguInput(raw);
+        if (!parsed) {
+          alert('无法识别洛谷题号，请检查格式：\n· 完整链接如 https://www.luogu.com.cn/problem/P1001\n· 或直接输入题号如 P1001');
+          problemInput.focus();
+          return;
+        }
+
+        const type = typeSelect.value;
+        problems.push({
+          id: generateId(),
+          link: parsed.fullLink,
+          problemId: parsed.problemId,
+          type: type,
+          date: Date.now()
+        });
+        saveToStorage();
+
+        problemInput.value = '';
+        previewHint.textContent = '支持完整链接或直接输入题号（如 P1001）';
+        previewHint.style.color = '#888';
+        problemInput.focus();
+
+        if (currentFilter !== 'all' && currentFilter !== type) currentFilter = 'all';
+        render();
+      }
+
+      function deleteProblem(id) {
+        if (!confirm('确定删除这道错题记录？')) return;
+        problems = problems.filter(p => p.id !== id);
+        saveToStorage();
+        render();
+      }
+
+      function updatePreview() {
+        const raw = problemInput.value.trim();
+        if (!raw) {
+          previewHint.textContent = '支持完整链接或直接输入题号（如 P1001）';
+          previewHint.style.color = '#888';
+          return;
+        }
+        const parsed = parseLuoguInput(raw);
+        if (parsed) {
+          previewHint.textContent = `✓ 解析为：${parsed.problemId}`;
+          previewHint.style.color = '#000';
+        } else {
+          previewHint.textContent = '⚠ 暂无法识别，请输入完整链接或题号';
+          previewHint.style.color = '#000';
+        }
+      }
+
+      // ---------- 事件 ----------
+      function initEventListeners() {
+        addBtn.addEventListener('click', addProblem);
+        problemInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') { e.preventDefault(); addProblem(); }
+        });
+        problemInput.addEventListener('input', updatePreview);
+
+        filterBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            currentFilter = btn.dataset.filter;
+            render();
+          });
+        });
+
+        problemListEl.addEventListener('click', (e) => {
+          const deleteBtn = e.target.closest('.delete-btn');
+          if (deleteBtn) {
+            const id = deleteBtn.dataset.id;
+            if (id) deleteProblem(id);
+          }
+        });
+      }
+
+      function init() {
+        loadFromStorage();
+        problems = problems.filter(p => ['gap', 'stable', 'low'].includes(p.type));
+        initEventListeners();
+        render();
+        updatePreview();
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
